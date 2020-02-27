@@ -1,77 +1,51 @@
 package com.example.eggtimer;
 
-import android.app.ActivityOptions;
-import android.content.Context;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity {
-    public final static int LOOPS = 1000;
-    public CarouselPagerAdapter adapter;
-    public ViewPager pager;
-//    private FragmentPagerAdapter fragmentPagerAdapter;
-    public static int count = 8; //ViewPager items size
-    public static int FIRST_PAGE = 8;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
-//    private List<Fragment> fragments = new ArrayList<Fragment>();
+//import android.support.v7.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    private ViewPager2 viewPager2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        ActivityCompat.postponeEnterTransition(this);
-
         setContentView(R.layout.activity_main);
-
-//        this.fragments.add(1, new ImageFragment());
-//        this.fragments.add(2, new ImageDetailsActivity());
-
-
-        pager = findViewById(R.id.pager);
-
-        //set page margin between pages for viewpager
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int pageMargin = ((metrics.widthPixels / 4) * 2);
-        pager.setPageMargin(-pageMargin);
-
-        adapter = new CarouselPagerAdapter(this, getSupportFragmentManager());
-        pager.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-
-        pager.addOnPageChangeListener(adapter);
-
-        // Set current item to the middle page so we can fling to both
-        // directions left and right
-        pager.setCurrentItem(FIRST_PAGE);
-        pager.setOffscreenPageLimit(3);
-
+        viewPager2 = findViewById(R.id.viewPager2);
+        setUpPagerAdapter();
     }
 
+    /**
+     * set up adapter same like you do for RecyclerView or other components
+     */
+    private void setUpPagerAdapter() {
+        PagerAdapter pagerAdapter = new PagerAdapter(fetchDummyData());
+        viewPager2.setAdapter(pagerAdapter);
+        viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+    }
 
-
-
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-
+    /**
+     *
+     * @return this method will return dummy data in form of list
+     */
+    private List<PagerM> fetchDummyData() {
+        List<PagerM> pagerMList = new ArrayList<>();
+        String[] dummyArr = getResources().getStringArray(R.array.array_str_values);
+        for (String str : dummyArr) {
+            PagerM pagerM = new PagerM();
+            pagerM.setPagerDescription(str);
+            pagerMList.add(pagerM);
+        }
+        return pagerMList;
     }
 }
+
+
 
 
