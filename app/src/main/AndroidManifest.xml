@@ -18,12 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">-->
-            <!--<changeBounds/>-->
-            <!--<changeTransform/>-->
-            <!--<changeClipBounds/>-->
-            <!--<changeImageTransform/>-->
-        <!--</transitionSet>-->
     </application>
 
 </manifest>

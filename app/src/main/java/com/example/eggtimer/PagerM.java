@@ -1,13 +1,13 @@
 package com.example.eggtimer;
 
 public class PagerM {
-    private String pagerDescription;
+    private int imageId;
 
-    public String getPagerDescription() {
-        return pagerDescription;
+    public int getImageId() {
+        return imageId;
     }
 
-    public void setPagerDescription(String pagerDescription) {
-        this.pagerDescription = pagerDescription;
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
 }
