@@ -34,17 +34,22 @@
         android:id="@+id/time_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#FFFF"
         android:gravity="center"
         android:padding="16dp"
         android:textAppearance="@android:style/TextAppearance.Large"
         android:textSize="56sp"
+        android:textColor="#E2E0E0"
+        android:layout_gravity="center"
         tools:text="00:00" />
 
 
     <Button
         android:id="@+id/btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="161dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:background="@drawable/mybutton"
+        android:padding="10dp"
+        android:textColor="#000" />
 
 </LinearLayout>

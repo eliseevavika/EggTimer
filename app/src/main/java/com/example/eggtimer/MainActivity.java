@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     TextView timeView;
     long starttime = 0;
     long mTimeLeftInMillis = starttime;
+    Button btn;
 
     public static final int[] imageArray = {R.drawable.image, R.drawable.image, R.drawable.image};
 
@@ -51,8 +52,40 @@ public class MainActivity extends AppCompatActivity {
         timeView = findViewById(R.id.time_view);
         viewPager2 = findViewById(R.id.viewPager2);
         tabLayout = findViewById(R.id.tab_layout);
-
+        btn = findViewById(R.id.btn);
         viewPager2.setAdapter(createCardAdapter());
+
+        timeView.setText(String.format("%02d:%02d", 4, 40));
+
+        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                timer.cancel();
+                handler.removeCallbacks(run);
+                mTimeLeftInMillis = 0;
+                starttime = 0;
+                btn.setText("start");
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
+                switch (position) {
+                    case 0:
+                        timeView.setText(String.format("%02d:%02d", 4, 40));
+                        break;
+                    case 1:
+                        timeView.setText(String.format("%02d:%02d", 5, 40));
+                        break;
+                    case 2:
+                        timeView.setText(String.format("%02d:%02d", 9, 40));
+                        break;
+                }
+            }
+        });
+
 
         String[] strings = new String[]{"SOFT", "MEDIUM", "HARD"};
 
@@ -60,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 (tab, position) -> tab.setText(strings[position])).attach();
         setUpPagerAdapter();
 
-        Button btn = findViewById(R.id.btn);
         btn.setText("start");
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +121,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void startStopAction(Button btn) {
         if (btn.getText().equals("stop")) {
-            timeView.setText(String.format("%02d:%02d", 0, 0));
+            int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
+            int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+            timeView.setText(String.format("%02d:%02d", minutes, seconds));
+
+//            timeView.setText(String.format("%02d:%02d", 0, 0));
             timer.cancel();
             handler.removeCallbacks(run);
             mTimeLeftInMillis = 0;
@@ -106,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFinish() {
-                    timeView.setText("Stop");
+//                    timeView.setText("Stop");
 //                            ring = MediaPlayer.create(ImageDetailsActivity.this, R.raw.ring);
 //                            ring.start();
 //                            ring.setLooping(true);
