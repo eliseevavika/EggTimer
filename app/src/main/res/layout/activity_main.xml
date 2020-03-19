@@ -50,6 +50,7 @@
         android:layout_gravity="center"
         android:background="@drawable/mybutton"
         android:padding="10dp"
+        android:text="@string/action_start"
         android:textColor="#000" />
 
 </LinearLayout>

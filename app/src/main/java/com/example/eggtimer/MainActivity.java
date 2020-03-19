@@ -1,9 +1,8 @@
 package com.example.eggtimer;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -12,59 +11,59 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+enum ButtonState {Start, Stop}
 
 public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     TextView timeView;
-    long starttime = 0;
-    long mTimeLeftInMillis = starttime;
-    Button btn;
+    MediaPlayer ring;
+    long mTimeLeftInMillis = 0;
+    Button startStopButton;
+    CountDownTimer countDownTimer;
+
+    private ButtonState startStopButtonState = ButtonState.Start;
 
     public static final int[] imageArray = {R.drawable.image, R.drawable.image, R.drawable.image};
-
-    Handler handler = new Handler();
-
-    Runnable run = new Runnable() {
-        @Override
-        public void run() {
-
-            int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
-            int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
-            timeView.setText(String.format("%02d:%02d", minutes, seconds));
-
-            handler.postDelayed(this, 1000);
-        }
-    };
-
-    Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         timeView = findViewById(R.id.time_view);
-        viewPager2 = findViewById(R.id.viewPager2);
         tabLayout = findViewById(R.id.tab_layout);
-        btn = findViewById(R.id.btn);
-        viewPager2.setAdapter(createCardAdapter());
-
+        startStopButton = findViewById(R.id.btn);
         timeView.setText(String.format("%02d:%02d", 4, 40));
 
+        setUpViewPager();
+
+        String[] strings = new String[]{"SOFT", "MEDIUM", "HARD"};
+
+        new TabLayoutMediator(tabLayout, viewPager2,
+                (tab, position) -> tab.setText(strings[position])).attach();
+        setUpPagerAdapter();
+        startStopButton.setOnClickListener(v -> {
+            if (startStopButtonState == ButtonState.Start) {
+                onStartClick();
+            } else if (startStopButtonState == ButtonState.Stop) {
+                onStopClick();
+            } else throw new IllegalStateException("Invalid State");
+        });
+    }
+
+    private void setUpViewPager() {
+        viewPager2 = findViewById(R.id.viewPager2);
+        viewPager2.setAdapter(createCardAdapter());
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                timer.cancel();
-                handler.removeCallbacks(run);
                 mTimeLeftInMillis = 0;
-                starttime = 0;
-                btn.setText("start");
+                startStopButton.setText(R.string.action_start);
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
@@ -85,73 +84,45 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-        String[] strings = new String[]{"SOFT", "MEDIUM", "HARD"};
-
-        new TabLayoutMediator(tabLayout, viewPager2,
-                (tab, position) -> tab.setText(strings[position])).attach();
-        setUpPagerAdapter();
-
-        btn.setText("start");
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = tabLayout.getSelectedTabPosition();
-
-                switch (position) {
-                    case 0:
-                        mTimeLeftInMillis = 280000;
-                        startStopAction(btn);
-                        break;
-                    case 1:
-                        mTimeLeftInMillis = 340000;
-                        startStopAction(btn);
-                        break;
-                    case 2:
-                        mTimeLeftInMillis = 580000;
-                        startStopAction(btn);
-                        break;
-                }
-
-
-            }
-        });
     }
 
-    private void startStopAction(Button btn) {
-        if (btn.getText().equals("stop")) {
-            int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
-            int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
-            timeView.setText(String.format("%02d:%02d", minutes, seconds));
-
-//            timeView.setText(String.format("%02d:%02d", 0, 0));
-            timer.cancel();
-            handler.removeCallbacks(run);
-            mTimeLeftInMillis = 0;
-            starttime = 0;
-            btn.setText("start");
-        } else {
-            starttime = System.currentTimeMillis();
-            timer = new Timer();
-            new CountDownTimer(mTimeLeftInMillis, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    mTimeLeftInMillis = millisUntilFinished;
-                }  
-
-                @Override
-                public void onFinish() {
-//                    timeView.setText("Stop");
-//                            ring = MediaPlayer.create(ImageDetailsActivity.this, R.raw.ring);
-//                            ring.start();
-//                            ring.setLooping(true);
-                }
-            }.start();
-
-            handler.postDelayed(run, 0);
-            btn.setText("stop");
+    private void onStopClick() {
+        viewPager2.setUserInputEnabled(true);
+        countDownTimer.cancel();
+        startStopButtonState = ButtonState.Start;
+        startStopButton.setText(R.string.action_start);
+        if (ring != null) {
+            ring.stop();
+            ring = null;
         }
+        mTimeLeftInMillis = getTimerValue();
+        int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
+        int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+        timeView.setText(String.format("%02d:%02d", minutes, seconds));
+    }
+
+    private void onStartClick() {
+        startStopButtonState = ButtonState.Stop;
+        startStopButton.setText("stop");
+        mTimeLeftInMillis = getTimerValue();
+        viewPager2.setUserInputEnabled(false);
+
+        countDownTimer = new CountDownTimer(mTimeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mTimeLeftInMillis = millisUntilFinished;
+                int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
+                int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+                timeView.setText(String.format("%02d:%02d", minutes, seconds));
+            }
+
+            @Override
+            public void onFinish() {
+                ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
+                ring.start();
+                ring.setLooping(true);
+            }
+        }.start();
     }
 
     private ViewPagerAdapter createCardAdapter() {
@@ -174,6 +145,19 @@ public class MainActivity extends AppCompatActivity {
             pagerMList.add(pagerM);
         }
         return pagerMList;
+    }
+
+    private long getTimerValue() {
+        int position = tabLayout.getSelectedTabPosition();
+        switch (position) {
+            case 0:
+                return TimeUnit.SECONDS.toMillis(4);
+            case 1:
+                return TimeUnit.MINUTES.toMillis(5) + TimeUnit.SECONDS.toMillis(40);
+            case 2:
+                return TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(40);
+        }
+        throw new IllegalStateException("Is there an extra Tab");
     }
 }
 
