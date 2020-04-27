@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ButtonState startStopButtonState = ButtonState.Start;
 
-    public static final int[] imageArray = {R.drawable.image, R.drawable.image, R.drawable.image};
+    public static final int[] imageArray = {R.drawable.ic_layer1, R.drawable.ic_layer2, R.drawable.ic_layer3};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

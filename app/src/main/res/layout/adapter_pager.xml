@@ -9,13 +9,13 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000"
-        android:scaleType="fitCenter"
-        android:layout_margin="60dp"
-        android:paddingBottom="100dp"
-        android:src="@drawable/image"
-        />
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_layer1"
+        android:tint="#f8be01"
+        android:scaleType="center"
+        android:layout_marginTop="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     />
