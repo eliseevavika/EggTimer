@@ -1,9 +1,15 @@
 package com.example.eggtimer;
 
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
@@ -25,11 +31,18 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer ring;
     long mTimeLeftInMillis = 0;
     Button startStopButton;
+    ImageButton vibrationButton;
     CountDownTimer countDownTimer;
+    int vibrationOn = 0;
+    Vibrator vibration;
+    public static final String MyPREFERENCES = "MyPrefs";
+    public static final String VIBR_ON = "vibrationOnString";
+    SharedPreferences sharedPreferences;
 
     private ButtonState startStopButtonState = ButtonState.Start;
 
-    public static final int[] imageArray = {R.drawable.ic_layer1, R.drawable.ic_layer2, R.drawable.ic_layer3};
+    public static final int[] imageArray = {R.drawable.ic_new_layer1, R.drawable.ic_new_layer2, R.drawable.ic_new_layer3};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +51,11 @@ public class MainActivity extends AppCompatActivity {
         timeView = findViewById(R.id.time_view);
         tabLayout = findViewById(R.id.tab_layout);
         startStopButton = findViewById(R.id.btn);
-        timeView.setText(String.format("%02d:%02d", 4, 40));
+        vibrationButton = findViewById(R.id.btn_vibr);
+        vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
+        sharedPreferences = getSharedPreferences(
+                MyPREFERENCES, MODE_PRIVATE);
 
         setUpViewPager();
 
@@ -46,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         new TabLayoutMediator(tabLayout, viewPager2,
                 (tab, position) -> tab.setText(strings[position])).attach();
+
         setUpPagerAdapter();
+
         startStopButton.setOnClickListener(v -> {
             if (startStopButtonState == ButtonState.Start) {
                 onStartClick();
@@ -54,11 +73,43 @@ public class MainActivity extends AppCompatActivity {
                 onStopClick();
             } else throw new IllegalStateException("Invalid State");
         });
+
+        vibrationButton.setOnClickListener(view -> {
+            if (vibrationOn == 1) {
+                vibrationOn = 0;
+                SavePreferences(VIBR_ON, 0);
+                vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
+            } else {
+                vibrationOn = 1;
+                SavePreferences(VIBR_ON, 1);
+                vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
+            }
+        });
+
+        LoadPreferences();
+    }
+
+    private void SavePreferences(String key, int value) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
+    private void LoadPreferences() {
+        int savedRadioIndex = sharedPreferences.getInt(
+                VIBR_ON, 0);
+        vibrationOn = savedRadioIndex;
+        if (savedRadioIndex == 0) {
+            vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
+        } else {
+            vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
+        }
     }
 
     private void setUpViewPager() {
         viewPager2 = findViewById(R.id.viewPager2);
         viewPager2.setAdapter(createCardAdapter());
+
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -87,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onStopClick() {
+        vibration.cancel();
+        LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+        tabStrip.setEnabled(false);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(true);
+        }
+
         viewPager2.setUserInputEnabled(true);
         countDownTimer.cancel();
         startStopButtonState = ButtonState.Start;
@@ -105,6 +163,13 @@ public class MainActivity extends AppCompatActivity {
         startStopButtonState = ButtonState.Stop;
         startStopButton.setText("stop");
         mTimeLeftInMillis = getTimerValue();
+
+        LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+        tabStrip.setEnabled(false);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(false);
+        }
+
         viewPager2.setUserInputEnabled(false);
 
         countDownTimer = new CountDownTimer(mTimeLeftInMillis, 1000) {
@@ -118,9 +183,18 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
-                ring.start();
-                ring.setLooping(true);
+                long[] mVibratePattern = new long[]{0, 400, 200, 400};
+                if (vibrationOn == 0) {
+                    ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
+                    ring.start();
+                    ring.setLooping(true);
+                } else {
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, 0));
+                    } else {
+                        vibration.vibrate(200);
+                    }
+                }
             }
         }.start();
     }
@@ -134,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         PagerAdapter pagerAdapter = new PagerAdapter(fetchDummyData());
         viewPager2.setAdapter(pagerAdapter);
         viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+        viewPager2.setCurrentItem(1, false);
     }
 
     private List<PagerM> fetchDummyData() {

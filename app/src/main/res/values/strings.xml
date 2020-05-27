@@ -1,12 +1,5 @@
 <resources>
     <string name="app_name">EggTimer</string>
-    <string-array name="array_str_values">
-        <item>Cat</item>
-        <item>Dog</item>
-        <item>Person</item>
-    </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="action_start">start</string>
 </resources>
