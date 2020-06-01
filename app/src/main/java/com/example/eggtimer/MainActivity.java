@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<TimerTab> timerTabs = new ArrayList() {
         {
-            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.SECONDS.toMillis(4)));
+            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(40)));
             add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(5) + TimeUnit.SECONDS.toMillis(40)));
             add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(40)));
         }
