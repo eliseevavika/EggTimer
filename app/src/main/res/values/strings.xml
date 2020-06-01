@@ -2,4 +2,8 @@
     <string name="app_name">EggTimer</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="action_start">start</string>
+    <string name="action_stop">stop</string>
+    <string name="tab_title_soft">soft</string>
+    <string name="tab_title_medium">medium</string>
+    <string name="tab_title_hard">hard</string>
 </resources>

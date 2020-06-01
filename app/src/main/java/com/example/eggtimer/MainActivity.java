@@ -33,38 +33,41 @@ public class MainActivity extends AppCompatActivity {
     Button startStopButton;
     ImageButton vibrationButton;
     CountDownTimer countDownTimer;
-    int vibrationOn = 0;
+    boolean vibrationOn = false;
     Vibrator vibration;
-    public static final String MyPREFERENCES = "MyPrefs";
+    public static final String MY_PREFERENCES = "MyPrefs";
     public static final String VIBR_ON = "vibrationOnString";
-    SharedPreferences sharedPreferences;
+
+    private SharedPreferences sharedPreferences;
 
     private ButtonState startStopButtonState = ButtonState.Start;
 
-    public static final int[] imageArray = {R.drawable.ic_new_layer1, R.drawable.ic_new_layer2, R.drawable.ic_new_layer3};
-
+    private List<TimerTab> timerTabs = new ArrayList() {
+        {
+            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.SECONDS.toMillis(4)));
+            add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(5) + TimeUnit.SECONDS.toMillis(40)));
+            add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(40)));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         timeView = findViewById(R.id.time_view);
         tabLayout = findViewById(R.id.tab_layout);
         startStopButton = findViewById(R.id.btn);
         vibrationButton = findViewById(R.id.btn_vibr);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
-        sharedPreferences = getSharedPreferences(
-                MyPREFERENCES, MODE_PRIVATE);
-
+        sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         setUpViewPager();
 
-        String[] strings = new String[]{"SOFT", "MEDIUM", "HARD"};
-
-        new TabLayoutMediator(tabLayout, viewPager2,
-                (tab, position) -> tab.setText(strings[position])).attach();
-
-        setUpPagerAdapter();
+        new TabLayoutMediator(
+                tabLayout,
+                viewPager2,
+                (tab, position) -> tab.setText(timerTabs.get(position).tabName)
+        ).attach();
 
         startStopButton.setOnClickListener(v -> {
             if (startStopButtonState == ButtonState.Start) {
@@ -75,31 +78,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         vibrationButton.setOnClickListener(view -> {
-            if (vibrationOn == 1) {
-                vibrationOn = 0;
-                SavePreferences(VIBR_ON, 0);
+            if (vibrationOn) {
+                vibrationOn = false;
+                savePreferences(false);
                 vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
             } else {
-                vibrationOn = 1;
-                SavePreferences(VIBR_ON, 1);
+                vibrationOn = true;
+                savePreferences(true);
                 vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
             }
         });
 
-        LoadPreferences();
+        loadPreferences();
     }
 
-    private void SavePreferences(String key, int value) {
+    private void savePreferences(boolean value) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(key, value);
+        editor.putBoolean(MainActivity.VIBR_ON, value);
         editor.apply();
     }
 
-    private void LoadPreferences() {
-        int savedRadioIndex = sharedPreferences.getInt(
-                VIBR_ON, 0);
-        vibrationOn = savedRadioIndex;
-        if (savedRadioIndex == 0) {
+    private void loadPreferences() {
+        vibrationOn = sharedPreferences.getBoolean(VIBR_ON, false);
+        if (!vibrationOn) {
             vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
         } else {
             vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
@@ -108,8 +109,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpViewPager() {
         viewPager2 = findViewById(R.id.viewPager2);
-        viewPager2.setAdapter(createCardAdapter());
+        registerOnPageChangeCallback();
+        PagerAdapter pagerAdapter = new PagerAdapter(timerTabs);
+        viewPager2.setAdapter(pagerAdapter);
+        viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+        viewPager2.setCurrentItem(1, false);
+    }
 
+    private void registerOnPageChangeCallback() {
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -144,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < tabStrip.getChildCount(); i++) {
             tabStrip.getChildAt(i).setClickable(true);
         }
-
         viewPager2.setUserInputEnabled(true);
         countDownTimer.cancel();
         startStopButtonState = ButtonState.Start;
@@ -161,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onStartClick() {
         startStopButtonState = ButtonState.Stop;
-        startStopButton.setText("stop");
+        startStopButton.setText(R.string.action_stop);
         mTimeLeftInMillis = getTimerValue();
 
         LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
@@ -184,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 long[] mVibratePattern = new long[]{0, 400, 200, 400};
-                if (vibrationOn == 0) {
+                if (!vibrationOn) {
                     ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
                     ring.start();
                     ring.setLooping(true);
@@ -199,38 +205,15 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
-    private ViewPagerAdapter createCardAdapter() {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
-        return adapter;
-    }
-
-    private void setUpPagerAdapter() {
-        PagerAdapter pagerAdapter = new PagerAdapter(fetchDummyData());
-        viewPager2.setAdapter(pagerAdapter);
-        viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
-        viewPager2.setCurrentItem(1, false);
-    }
-
-    private List<PagerM> fetchDummyData() {
-        List<PagerM> pagerMList = new ArrayList<>();
-
-        for (int image : imageArray) {
-            PagerM pagerM = new PagerM();
-            pagerM.setImageId(image);
-            pagerMList.add(pagerM);
-        }
-        return pagerMList;
-    }
-
     private long getTimerValue() {
         int position = tabLayout.getSelectedTabPosition();
         switch (position) {
             case 0:
-                return TimeUnit.SECONDS.toMillis(4);
+                return timerTabs.get(0).timeMillis;
             case 1:
-                return TimeUnit.MINUTES.toMillis(5) + TimeUnit.SECONDS.toMillis(40);
+                return timerTabs.get(1).timeMillis;
             case 2:
-                return TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(40);
+                return timerTabs.get(2).timeMillis;
         }
         throw new IllegalStateException("Is there an extra Tab");
     }
