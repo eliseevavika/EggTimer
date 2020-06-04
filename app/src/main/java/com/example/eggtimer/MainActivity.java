@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     Button startStopButton;
     ImageButton vibrationButton;
     CountDownTimer countDownTimer;
-    boolean vibrationOn = false;
+    int vibrationOn = 0;
     Vibrator vibration;
     public static final String MY_PREFERENCES = "MyPrefs";
     public static final String VIBR_ON = "vibrationOnString";
@@ -78,13 +78,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         vibrationButton.setOnClickListener(view -> {
-            if (vibrationOn) {
-                vibrationOn = false;
-                savePreferences(false);
+            if (vibrationOn == 1) {
+                vibrationOn = 0;
+                savePreferences(0);
                 vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
             } else {
-                vibrationOn = true;
-                savePreferences(true);
+                vibrationOn = 1;
+                savePreferences(1);
                 vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
             }
         });
@@ -92,15 +92,15 @@ public class MainActivity extends AppCompatActivity {
         loadPreferences();
     }
 
-    private void savePreferences(boolean value) {
+    private void savePreferences(int value) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(MainActivity.VIBR_ON, value);
+        editor.putInt(MainActivity.VIBR_ON, value);
         editor.apply();
     }
 
     private void loadPreferences() {
-        vibrationOn = sharedPreferences.getBoolean(VIBR_ON, false);
-        if (!vibrationOn) {
+        vibrationOn = sharedPreferences.getInt(VIBR_ON, 0);
+        if (vibrationOn == 0) {
             vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
         } else {
             vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 long[] mVibratePattern = new long[]{0, 400, 200, 400};
-                if (!vibrationOn) {
+                if (vibrationOn == 0) {
                     ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
                     ring.start();
                     ring.setLooping(true);
