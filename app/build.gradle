@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.eggtimer"
+        applicationId "com.project.eggtimer"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
