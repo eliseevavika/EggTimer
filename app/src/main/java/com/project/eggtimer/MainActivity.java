@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,11 +43,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ButtonState startStopButtonState = ButtonState.Start;
 
-    private List<TimerTab> timerTabs = new ArrayList() {
+    private final List<TimerTab> timerTabs = new ArrayList<TimerTab>() {
         {
-            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(40)));
-            add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(5) + TimeUnit.SECONDS.toMillis(40)));
-            add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(40)));
+            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(0)));
+            add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(6) + TimeUnit.SECONDS.toMillis(0)));
+            add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(0)));
         }
     };
 
@@ -131,13 +132,13 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (position) {
                     case 0:
-                        timeView.setText(String.format("%02d:%02d", 4, 40));
+                        timeView.setText(String.format(Locale.US, "%02d:%02d", 4, 0));
                         break;
                     case 1:
-                        timeView.setText(String.format("%02d:%02d", 5, 40));
+                        timeView.setText(String.format(Locale.US, "%02d:%02d", 6, 0));
                         break;
                     case 2:
-                        timeView.setText(String.format("%02d:%02d", 9, 40));
+                        timeView.setText(String.format(Locale.US, "%02d:%02d", 9, 0));
                         break;
                 }
             }
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         mTimeLeftInMillis = getTimerValue();
         int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
-        timeView.setText(String.format("%02d:%02d", minutes, seconds));
+        timeView.setText(String.format(Locale.US, "%02d:%02d", minutes, seconds));
     }
 
     private void onStartClick() {
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 mTimeLeftInMillis = millisUntilFinished;
                 int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
                 int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
-                timeView.setText(String.format("%02d:%02d", minutes, seconds));
+                timeView.setText(String.format(Locale.US, "%02d:%02d", minutes, seconds));
             }
 
             @Override

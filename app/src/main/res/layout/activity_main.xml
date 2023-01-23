@@ -28,7 +28,7 @@
         android:id="@+id/viewPager2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/btn"
+        app:layout_constraintBottom_toTopOf="@+id/time_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_layout"
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:padding="16dp"
+        android:padding="6dp"
         android:textAppearance="@android:style/TextAppearance.Large"
         android:textColor="#000"
         android:textSize="56sp"
@@ -58,10 +58,10 @@
         android:background="#00000000"
         android:padding="10dp"
         android:textColor="#000"
-        android:tint="#000000"
         app:layout_constraintBottom_toBottomOf="@+id/btn"
         app:layout_constraintEnd_toStartOf="@+id/time_view"
-        tools:src="@drawable/ic_notifications_none_black_24dp" />
+        tools:src="@drawable/ic_notifications_none_black_24dp"
+        app:tint="#000000" />
 
     <Button
         android:id="@+id/btn"
@@ -76,6 +76,5 @@
         android:textColor="#000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewPager2" />
+        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
