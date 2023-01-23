@@ -12,6 +12,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -20,12 +23,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
-
 enum ButtonState {Start, Stop}
 
 public class MainActivity extends AppCompatActivity {
+    public static final String MY_PREFERENCES = "MyPrefs";
+    public static final String VIBR_ON = "vibrationOnString";
+    private final List<TimerTab> timerTabs = new ArrayList<TimerTab>() {
+        {
+            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(0)));
+            add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(6) + TimeUnit.SECONDS.toMillis(0)));
+            add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(0)));
+        }
+    };
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     TextView timeView;
@@ -36,20 +45,8 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer countDownTimer;
     int vibrationOn = 0;
     Vibrator vibration;
-    public static final String MY_PREFERENCES = "MyPrefs";
-    public static final String VIBR_ON = "vibrationOnString";
-
     private SharedPreferences sharedPreferences;
-
     private ButtonState startStopButtonState = ButtonState.Start;
-
-    private final List<TimerTab> timerTabs = new ArrayList<TimerTab>() {
-        {
-            add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(0)));
-            add(new TimerTab(R.string.tab_title_medium, R.drawable.ic_new_layer2, TimeUnit.MINUTES.toMillis(6) + TimeUnit.SECONDS.toMillis(0)));
-            add(new TimerTab(R.string.tab_title_hard, R.drawable.ic_new_layer3, TimeUnit.MINUTES.toMillis(9) + TimeUnit.SECONDS.toMillis(0)));
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
