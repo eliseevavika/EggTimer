@@ -27,7 +27,6 @@ enum ButtonState {Start, Stop}
 
 public class MainActivity extends AppCompatActivity {
     public static final String MY_PREFERENCES = "MyPrefs";
-    public static final String VIBRATION_ON = "vibrationOnString";
     private final List<TimerTab> timerTabs = new ArrayList<TimerTab>() {
         {
             add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(0)));
@@ -43,22 +42,35 @@ public class MainActivity extends AppCompatActivity {
     Button startStopButton;
     ImageButton vibrationButton;
     CountDownTimer countDownTimer;
-    int vibrationOn = 0;
+    Boolean vibrationOn = false;
     Vibrator vibration;
     private SharedPreferences sharedPreferences;
     private ButtonState startStopButtonState = ButtonState.Start;
+    private TimerViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        vibrationButton = findViewById(R.id.btn_vibration);
+
+        sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+
+        TimerLocalDataSource local = new TimerLocalDataSource(sharedPreferences);
+        TimerRepository repository = new TimerRepository(local);
+
+        viewModel = new TimerViewModel(repository);
+        viewModel.isVibrationOn.observe(this, value -> {
+            vibrationOn = value;
+            vibrationButton.setImageResource(value ? R.drawable.ic_vibration_black_24dp : R.drawable.ic_notifications_none_black_24dp);
+        });
+
         timeView = findViewById(R.id.time_view);
         tabLayout = findViewById(R.id.tab_layout);
         startStopButton = findViewById(R.id.btn_start_stop);
-        vibrationButton = findViewById(R.id.btn_vibration);
+
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         setUpViewPager();
 
         new TabLayoutMediator(
@@ -76,33 +88,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         vibrationButton.setOnClickListener(view -> {
-            if (vibrationOn == 1) {
-                vibrationOn = 0;
-                savePreferences(0);
-                vibrationButton.setImageResource(R.drawable.ic_notifications_none_black_24dp);
-            } else {
-                vibrationOn = 1;
-                savePreferences(1);
-                vibrationButton.setImageResource(R.drawable.ic_vibration_black_24dp);
-            }
+            viewModel.onVibrationButtonClicked();
+            Boolean value = viewModel.isVibrationOn.getValue();
+            vibrationOn = value;
         });
-
-        loadPreferences();
-    }
-
-    private void savePreferences(int value) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(MainActivity.VIBRATION_ON, value);
-        editor.apply();
-    }
-
-    private void loadPreferences() {
-        vibrationOn = sharedPreferences.getInt(VIBRATION_ON, 0);
-        if (vibrationOn == 0) {
-            vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
-        } else {
-            vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
-        }
     }
 
     private void setUpViewPager() {
@@ -144,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onStopClick() {
         vibration.cancel();
+        vibrationButton.setEnabled(true);
         LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
         tabStrip.setEnabled(false);
         for (int i = 0; i < tabStrip.getChildCount(); i++) {
@@ -188,11 +178,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 long[] mVibratePattern = new long[]{0, 400, 200, 400};
-                if (vibrationOn == 0) {
+                if (!vibrationOn) {
+                    vibrationButton.setEnabled(false);
                     ring = MediaPlayer.create(MainActivity.this, R.raw.ring);
                     ring.start();
                     ring.setLooping(true);
                 } else {
+                    vibrationButton.setEnabled(false);
                     if (Build.VERSION.SDK_INT >= 26) {
                         vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, 0));
                     } else {
