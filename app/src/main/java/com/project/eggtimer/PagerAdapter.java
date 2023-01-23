@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PagerAdapter extends RecyclerView.Adapter {
 
-    private List<TimerTab> tabs;
+    private final List<TimerTab> tabs;
 
     public PagerAdapter(List<TimerTab> tabs) {
         this.tabs = tabs;
@@ -37,7 +37,7 @@ public class PagerAdapter extends RecyclerView.Adapter {
 }
 
 class PagerViewHolder extends RecyclerView.ViewHolder {
-    private ImageView imageView;
+    private final ImageView imageView;
 
     public PagerViewHolder(@NonNull View itemView) {
         super(itemView);

@@ -27,7 +27,7 @@ enum ButtonState {Start, Stop}
 
 public class MainActivity extends AppCompatActivity {
     public static final String MY_PREFERENCES = "MyPrefs";
-    public static final String VIBR_ON = "vibrationOnString";
+    public static final String VIBRATION_ON = "vibrationOnString";
     private final List<TimerTab> timerTabs = new ArrayList<TimerTab>() {
         {
             add(new TimerTab(R.string.tab_title_soft, R.drawable.ic_new_layer1, TimeUnit.MINUTES.toMillis(4) + TimeUnit.SECONDS.toMillis(0)));
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
         timeView = findViewById(R.id.time_view);
         tabLayout = findViewById(R.id.tab_layout);
-        startStopButton = findViewById(R.id.btn);
-        vibrationButton = findViewById(R.id.btn_vibr);
+        startStopButton = findViewById(R.id.btn_start_stop);
+        vibrationButton = findViewById(R.id.btn_vibration);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         setUpViewPager();
@@ -79,11 +79,11 @@ public class MainActivity extends AppCompatActivity {
             if (vibrationOn == 1) {
                 vibrationOn = 0;
                 savePreferences(0);
-                vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
+                vibrationButton.setImageResource(R.drawable.ic_notifications_none_black_24dp);
             } else {
                 vibrationOn = 1;
                 savePreferences(1);
-                vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_vibration_black_24dp));
+                vibrationButton.setImageResource(R.drawable.ic_vibration_black_24dp);
             }
         });
 
@@ -92,12 +92,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void savePreferences(int value) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(MainActivity.VIBR_ON, value);
+        editor.putInt(MainActivity.VIBRATION_ON, value);
         editor.apply();
     }
 
     private void loadPreferences() {
-        vibrationOn = sharedPreferences.getInt(VIBR_ON, 0);
+        vibrationOn = sharedPreferences.getInt(VIBRATION_ON, 0);
         if (vibrationOn == 0) {
             vibrationButton.setImageDrawable(getDrawable(R.drawable.ic_notifications_none_black_24dp));
         } else {

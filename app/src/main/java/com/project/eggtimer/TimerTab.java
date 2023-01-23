@@ -5,10 +5,10 @@ import androidx.annotation.StringRes;
 
 public class TimerTab {
     @StringRes
-    int tabName;
+    final int tabName;
     @DrawableRes
-    int image;
-    long timeMillis;
+    final int image;
+    final long timeMillis;
 
     public TimerTab(@StringRes int tabName, @DrawableRes int image, long timeMillis) {
         this.tabName = tabName;
