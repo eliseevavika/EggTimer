@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer countDownTimer;
     Boolean vibrationOn = false;
     Vibrator vibration;
-    private SharedPreferences sharedPreferences;
     private ButtonState startStopButtonState = ButtonState.Start;
     private TimerViewModel viewModel;
 
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         vibrationButton = findViewById(R.id.btn_vibration);
 
-        sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
 
         TimerLocalDataSource local = new TimerLocalDataSource(sharedPreferences);
         TimerRepository repository = new TimerRepository(local);
@@ -64,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel.isVibrationOn.observe(this, value -> {
             vibrationOn = value;
             vibrationButton.setImageResource(value ? R.drawable.ic_vibration_black_24dp : R.drawable.ic_notifications_none_black_24dp);
+            vibrationButton.setContentDescription(value? "vibration on" : "sound on" );
         });
 
         timeView = findViewById(R.id.time_view);
@@ -89,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         vibrationButton.setOnClickListener(view -> {
             viewModel.onVibrationButtonClicked();
-            Boolean value = viewModel.isVibrationOn.getValue();
-            vibrationOn = value;
+            vibrationOn = viewModel.isVibrationOn.getValue();
         });
     }
 

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class PagerAdapter extends RecyclerView.Adapter {
+public class PagerAdapter extends  RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<TimerTab> tabs;
 

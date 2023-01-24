@@ -3,8 +3,8 @@ package com.project.eggtimer;
 import android.content.SharedPreferences;
 
 public class TimerLocalDataSource {
-    SharedPreferences sharedPrefs;
-    private String vibration_key = "vibration";
+   private final SharedPreferences sharedPrefs;
+    private final String vibration_key = "vibration";
 
     TimerLocalDataSource(SharedPreferences sharedPrefs) {
         this.sharedPrefs = sharedPrefs;

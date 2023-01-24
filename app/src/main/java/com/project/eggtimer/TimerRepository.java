@@ -1,7 +1,7 @@
 package com.project.eggtimer;
 
 public class TimerRepository {
-    private TimerLocalDataSource local;
+    private final TimerLocalDataSource local;
 
     TimerRepository(TimerLocalDataSource local) {
         this.local = local;

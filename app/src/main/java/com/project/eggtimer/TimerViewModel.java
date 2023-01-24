@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class TimerViewModel extends ViewModel {
-    private TimerRepository timerRepository;
+    private final TimerRepository timerRepository;
 
     private final MutableLiveData<Boolean> _isVibrationOn = new MutableLiveData<>();
     public final LiveData<Boolean> isVibrationOn = _isVibrationOn;
