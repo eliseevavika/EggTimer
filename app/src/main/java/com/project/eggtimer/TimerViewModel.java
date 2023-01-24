@@ -1,4 +1,5 @@
 package com.project.eggtimer;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -15,12 +16,7 @@ public class TimerViewModel extends ViewModel {
     }
 
     public void onVibrationButtonClicked() {
-       Boolean value =  timerRepository.toggleVibration();
+        Boolean value = timerRepository.toggleVibration();
         _isVibrationOn.setValue(value);
     }
 }
-
-
-
-
-

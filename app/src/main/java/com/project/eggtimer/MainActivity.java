@@ -11,13 +11,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -63,14 +60,14 @@ public class MainActivity extends AppCompatActivity {
         viewModel.isVibrationOn.observe(this, value -> {
             vibrationOn = value;
             vibrationButton.setImageResource(value ? R.drawable.ic_vibration_black_24dp : R.drawable.ic_notifications_none_black_24dp);
-            vibrationButton.setContentDescription(value? "vibration on" : "sound on" );
+            vibrationButton.setContentDescription(value ? "vibration on" : "sound on");
         });
 
         timeView = findViewById(R.id.time_view);
         tabLayout = findViewById(R.id.tab_layout);
         startStopButton = findViewById(R.id.btn_start_stop);
-
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
         setUpViewPager();
 
         new TabLayoutMediator(
@@ -110,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 startStopButton.setText(R.string.action_start);
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
-
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
@@ -207,7 +203,3 @@ public class MainActivity extends AppCompatActivity {
         throw new IllegalStateException("Is there an extra Tab");
     }
 }
-
-
-
-
